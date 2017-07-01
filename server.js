@@ -10,5 +10,14 @@ const net = require( 'net' );
 
 var myServer = net.createServer(  );
 
+myServer.listen( {
+    host: '0.0.0.0',
+    port: 6969
+  }, function(){
 
-console.log( myServer );
+    console.log( 'server is now listening to port 6969.' );
+
+  } );
+myServer.on( 'request', function(){
+  console.log( 'there is a connection!' );
+} );
