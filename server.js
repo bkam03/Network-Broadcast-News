@@ -8,8 +8,9 @@ Each connected socket is a Duplex stream, when it emits a 'data' event, broadcas
 
 const net = require( 'net' );
 
-var myServer = net.createServer(  );
+var myServer = net.createServer();
 var socketArray = [];
+var socketID = 0;
 
 myServer.listen( {
     host: '0.0.0.0',
@@ -19,18 +20,27 @@ myServer.listen( {
 
     myServer.on( 'connection', function( connectingSocket ){
       console.log( 'connection event detected.' );
-
+      //console.log( connectingSocket );
       connectingSocket.on( 'data', function( data ){
         console.log( 'data event detected.' );
         console.log( 'server receiving ' + data );
         for( var i = 0; i < socketArray.length; i++ ){
-          socketArray[ i ].write( data );
-          console.log( `sending ${ data } to everything in the array` );
+          socketArray[ i ].write( `notYou: ${ data }` );
+        //  console.log( `sending ${ data } to everything in the array` );
         }
       } );
 
-      connectingSocket.on( 'close', function(){
-        console.log( 'socket has closed' );
+      connectingSocket.on( 'close', function( thing ){
+        console.log( '\n' );
+        for( var i = 0; i < socketArray.length; i++ ){
+            console.log( this.remotePort );
+            console.log( socketArray[ i ].remotePort );
+          if( socketArray[ i ].remotePort == this.remotePort ){
+            socketArray.splice( i, 1 );
+            console.log( socketArray.length );
+            i--;
+          }
+        }
       } );
 
       socketArray.push( connectingSocket );
