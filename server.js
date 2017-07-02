@@ -19,13 +19,16 @@ myServer.listen( {
     console.log( 'server is now listening to port 6969.' );
 
     myServer.on( 'connection', function( connectingSocket ){
-      console.log( 'connection event detected.' );
+      var transmittingPort = connectingSocket.remotePort;
+      //console.log( 'connection event detected.' );
       //console.log( connectingSocket );
       connectingSocket.on( 'data', function( data ){
-        console.log( 'data event detected.' );
-        console.log( 'server receiving ' + data );
+        //console.log( 'data event detected.' );
+        //console.log( 'server receiving ' + data );
         for( var i = 0; i < socketArray.length; i++ ){
-          socketArray[ i ].write( `notYou: ${ data }` );
+          if( socketArray[ i ].remotePort !== transmittingPort ){
+            socketArray[ i ].write( `${ transmittingPort }: ${ data }` );
+          }
         //  console.log( `sending ${ data } to everything in the array` );
         }
       } );
@@ -33,11 +36,11 @@ myServer.listen( {
       connectingSocket.on( 'close', function( thing ){
         console.log( '\n' );
         for( var i = 0; i < socketArray.length; i++ ){
-            console.log( this.remotePort );
-            console.log( socketArray[ i ].remotePort );
+            //console.log( this.remotePort );
+            //console.log( socketArray[ i ].remotePort );
           if( socketArray[ i ].remotePort == this.remotePort ){
             socketArray.splice( i, 1 );
-            console.log( socketArray.length );
+            //console.log( socketArray.length );
             i--;
           }
         }
