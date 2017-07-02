@@ -12,6 +12,8 @@ var myServer = net.createServer();
 var socketArray = [];
 var socketID = 0;
 
+
+
 myServer.listen( {
     host: '0.0.0.0',
     port: 6969
@@ -19,40 +21,73 @@ myServer.listen( {
     console.log( 'server is now listening to port 6969.' );
 
     myServer.on( 'connection', function( connectingSocket ){
-      var transmittingPort = connectingSocket.remotePort;
-      //console.log( 'connection event detected.' );
-      //console.log( connectingSocket );
-      connectingSocket.on( 'data', function( data ){
-        //console.log( 'data event detected.' );
-        //console.log( 'server receiving ' + data );
-        for( var i = 0; i < socketArray.length; i++ ){
-          if( socketArray[ i ].remotePort !== transmittingPort ){
-            socketArray[ i ].write( `${ transmittingPort }: ${ data }` );
-          }
-        //  console.log( `sending ${ data } to everything in the array` );
-        }
-      } );
+      connectingSocket.setEncoding( 'utf8' );
 
-      connectingSocket.on( 'close', function( thing ){
-        console.log( '\n' );
-        for( var i = 0; i < socketArray.length; i++ ){
-            //console.log( this.remotePort );
-            //console.log( socketArray[ i ].remotePort );
-          if( socketArray[ i ].remotePort == this.remotePort ){
-            socketArray.splice( i, 1 );
-            //console.log( socketArray.length );
-            i--;
+      var newSocket = {};
+      connectingSocket.write( 'set userName:' );
+      connectingSocket.on( 'data', getUserNameandAttachListeners );
+
+
+      /*function( data ){
+
+        connectingSocket.userName = data;
+        console.log( 'username is', connectingSocket.userName );
+
+
+        var transmittingPort = connectingSocket.remotePort;
+
+        connectingSocket.on( 'data', function( data ){
+          for( var i = 0; i < socketArray.length; i++ ){
+            if( socketArray[ i ].remotePort !== transmittingPort ){
+              socketArray[ i ].write( `${ this.userName }: ${ data }` );
+            }
+
           }
-        }
-      } );
+        } );
+
+        connectingSocket.on( 'close', function(){
+          for( var i = 0; i < socketArray.length; i++ ){
+            if( socketArray[ i ].remotePort == this.remotePort ){
+              socketArray.splice( i, 1 );
+              i--;
+            }        }
+        } );
+      } );*/
+
 
       socketArray.push( connectingSocket );
 
     } );
 
-
   }
 );
 
+function getUserNameandAttachListeners( data ){
 
-//the event listener has picked up a connection
+    this.userName = data.slice( 0, data.length - 1 );
+    console.log( `username is -${ this.userName }-` );
+
+    this.removeListener( 'data', getUserNameandAttachListeners );
+
+    var transmittingPort = this.remotePort;
+
+    this.on( 'data', function( data ){
+      for( var i = 0; i < socketArray.length; i++ ){
+        if( socketArray[ i ].remotePort !== transmittingPort ){
+          socketArray[ i ].write( `${ this.userName }: ${ data }` );
+        }
+
+      }
+    } );
+
+    this.on( 'close', function(){
+      for( var i = 0; i < socketArray.length; i++ ){
+        if( socketArray[ i ].remotePort == this.remotePort ){
+          socketArray.splice( i, 1 );
+          i--;
+        }
+      }
+    } );
+
+
+}
