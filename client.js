@@ -22,10 +22,11 @@ var socket = net.createConnection( 6969, '0.0.0.0', function(){
     //console.log( socket );
     });
 */
-    socket.on( 'data', function( chunk ){
+  socket.pipe( process.stdout );
+/*    socket.on( 'data', function( chunk ){
       console.log( chunk );
 
-    } );
+    } );*/
 
 /*  socket.on( 'data', function( chunk ){
     process.stdout.write( chunk );
