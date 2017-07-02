@@ -10,7 +10,7 @@ const net = require( 'net' );
 
 
 var socket = net.createConnection( 6969, '0.0.0.0', function(){
-  console.log( 'there is a client connection' );
+  //console.log( 'there is a client connection' );
 
   //encoding
   socket.setEncoding( 'utf8' );
@@ -33,9 +33,6 @@ var socket = net.createConnection( 6969, '0.0.0.0', function(){
     console.log( 'socket stdout' );
   });*/
 
-  socket.on( 'close', function(){
-    socket.write( 'i am closing' );
-  });
 } );
 
 //this socket is connected
