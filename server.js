@@ -23,10 +23,14 @@ myServer.listen( {
       connectingSocket.on( 'data', function( data ){
         console.log( 'data event detected.' );
         console.log( 'server receiving ' + data );
-       for( var i = 0; i < socketArray.length; i++ ){
+        for( var i = 0; i < socketArray.length; i++ ){
           socketArray[ i ].write( data );
-          console.log( `sending ${ data } to everything in the array supposedly` );
+          console.log( `sending ${ data } to everything in the array` );
         }
+      } );
+
+      connectingSocket.on( 'close', function(){
+        console.log( 'socket has closed' );
       } );
 
       socketArray.push( connectingSocket );
