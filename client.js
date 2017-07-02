@@ -15,12 +15,13 @@ var socket = net.createConnection( 6969, '0.0.0.0', function(){
   //encoding
   socket.setEncoding( 'utf8' );
 
-    process.stdin.on( 'data', function( chunk ){
+  process.stdin.pipe( socket );
+/*    process.stdin.on( 'data', function( chunk ){
       //console.log( 'stdin: ' + chunk );
       socket.write( chunk );
     //console.log( socket );
     });
-
+*/
     socket.on( 'data', function( chunk ){
       console.log( chunk );
 
