@@ -23,8 +23,10 @@ myServer.listen( {
       connectingSocket.on( 'data', function( data ){
         console.log( 'data event detected.' );
         console.log( 'server receiving ' + data );
-       /* for( var i = 0; i < socketArray.length; i++ ){
-        }*/
+       for( var i = 0; i < socketArray.length; i++ ){
+          socketArray[ i ].write( data );
+          console.log( `sending ${ data } to everything in the array supposedly` );
+        }
       } );
 
       socketArray.push( connectingSocket );
