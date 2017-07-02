@@ -32,6 +32,10 @@ var socket = net.createConnection( 6969, '0.0.0.0', function(){
     process.stdout.write( chunk );
     console.log( 'socket stdout' );
   });*/
+
+  socket.on( 'close', function(){
+    socket.write( 'i am closing' );
+  });
 } );
 
 //this socket is connected
