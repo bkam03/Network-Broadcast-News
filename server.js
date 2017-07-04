@@ -7,21 +7,24 @@
 const net = require( 'net' );
 
 function getUserNameandAttachListeners( data ){
-
-    var transmittingPort = this.remotePort;
-    this.userName = data.slice( 0, data.length - 1 );
-    console.log( `username is -${ this.userName }-` );
-
-    this.removeListener( 'data', getUserNameandAttachListeners );
+    //if( true ){
 
 
-    this.on( 'data', function( data ){
+      this.userName = data.slice( 0, data.length - 1 );
+      console.log( `username is -${ this.userName }-` );
+
+      this.removeListener( 'data', getUserNameandAttachListeners );
+   // }
+
+      attachInputListener( this );
+
+    /*this.on( 'data', function( data ){
       for( var i = 0; i < socketArray.length; i++ ){
-        if( socketArray[ i ].remotePort !== transmittingPort ){
+        if( socketArray[ i ].remotePort !== this.remotePort ){
           socketArray[ i ].write( `${ this.userName }: ${ data }` );
         }
       }
-    } );
+    } );*/
 
     this.on( 'close', function(){
       for( var i = 0; i < socketArray.length; i++ ){
@@ -34,6 +37,30 @@ function getUserNameandAttachListeners( data ){
 
 }
 
+function attachInputListener( stream ){
+  stream.on( 'data', function( data ){
+  for( var i = 0; i < socketArray.length; i++ ){
+    if( socketArray[ i ].remotePort !== stream.remotePort ){
+      socketArray[ i ].write( `${ stream.userName }: ${ data }` );
+    }
+  }
+} );
+}
+
+
+
+
+/*  var adminAccount = net.createConnection( 6969, '0.0.0.0', function(){
+    process.stdin.setEncoding( 'utf8' );
+    this.userName = 'ADMIN';
+
+
+    process.stdin.pipe( this );
+    this.pipe( process.stdout );
+  } );*/
+
+
+
 
 var myServer = net.createServer();
 var socketArray = [];
@@ -44,15 +71,32 @@ myServer.listen( {
   }, function(){
     console.log( 'server is now listening to port 6969.' );
 
-    myServer.on( 'connection', function( connectingSocket ){
-      connectingSocket.setEncoding( 'utf8' );
+    process.stdin.setEncoding( 'utf8' );
 
-      connectingSocket.write( 'set userName:' );
-      connectingSocket.on( 'data', getUserNameandAttachListeners );
+    /*var adminAccount = new net.Socket();
+    adminAccount.userName = 'ADMIN';
+    adminAccount.connect( 6969, '0.0.0.0', function(){
+      process.stdin.pipe( this );
+      this.pipe( process.stdout );
 
-      socketArray.push( connectingSocket );
+      attachInputListener( this );
 
-    } );
+      socketArray.push( adminAccount );*/
 
-  }
-);
+      myServer.on( 'connection', function( connectingSocket ){
+        connectingSocket.setEncoding( 'utf8' );
+
+        //console.log( !connectingSocket.hasOwnProperty( 'userName' ) );
+        connectingSocket.write( 'set userName:' );
+        connectingSocket.on( 'data', getUserNameandAttachListeners );
+
+        socketArray.push( connectingSocket );
+      } );
+/*    } );*/
+
+      var adminAccount = net.createConnection( 6969, '0.0.0.0', function(){
+        process.stdin.pipe( this );
+        this.pipe( process.stdout );
+        this.write( 'ADMIN ' );
+      } );
+});
